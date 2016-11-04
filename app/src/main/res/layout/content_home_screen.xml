@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/lawnhiro_home"
+    android:background="@mipmap/lawnhiro_home_phone"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -13,4 +13,84 @@
     tools:context="com.willydevelopment.com.lawnhiro.HomeScreen"
     tools:showIn="@layout/activity_home_screen">
 
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:padding="20px"
+                android:background="#80FFFFFF">
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textStyle="bold"
+                        android:text="\nOrdering a Lawnhiro is easy as \n"
+                        android:id="@+id/titleTextView"
+                        android:textSize="22dp"
+                        android:textIsSelectable="false"
+                        android:editable="false"/>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textStyle="italic"
+                        android:text="A.  Enter an address below to reveal your custom price instantly.\nB.  Add to cart\nC.  PayPal and you&apos;re done.\n\n*Every order receives:\n1.  Grass cut to 4&quot;\n2.  Light trim around structures\n3.  Blow grass clippings off driveways and sidewalks."
+                        android:id="@+id/infoTextView"
+                        android:textSize="12dp"
+                        android:textIsSelectable="false"
+                        android:editable="false"/>
+
+                </TableRow>
+            </TableLayout>
+        </TableRow>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:padding="20px"
+                android:background="#FFFFFF">
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textStyle="italic"
+                        android:hint="Address"
+                        android:id="@+id/addressTextView"
+                        android:textSize="12dp"/>
+
+                </TableRow>
+            </TableLayout>
+        </TableRow>
+    </TableLayout>
 </RelativeLayout>
