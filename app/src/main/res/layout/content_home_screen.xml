@@ -67,13 +67,13 @@
         </TableRow>
         <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp">
             <TableLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:padding="20px"
                 android:background="#FFFFFF">
 
                 <TableRow
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content">
 
                     <EditText
-                        android:layout_width="100dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textStyle="italic"
@@ -90,6 +90,31 @@
                         android:textSize="12dp"/>
 
                 </TableRow>
+            </TableLayout>
+        </TableRow>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp">
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Get Price!"
+                        android:id="@+id/getPriceButton"
+                        android:background="@drawable/button"
+                        android:textColor="@color/colorAccent"/>
+                </LinearLayout>
             </TableLayout>
         </TableRow>
     </TableLayout>
