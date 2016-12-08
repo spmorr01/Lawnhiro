@@ -1,16 +1,36 @@
 package com.willydevelopment.com.lawnhiro;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
 
 public class HomeScreen extends AppCompatActivity {
+
+    final Context context = this;
+    private Button button;
+    private EditText finalAddress;
+    /*private EditText address1;
+    private EditText address2;
+    private EditText city;
+    private EditText state;
+    private EditText zip;*/
+
+    private String tempAddress1;
+    private String tempAddress2;
+    private String tempCity;
+    private String tempState;
+    private String tempZip;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +39,12 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        finalAddress = (EditText) findViewById(R.id.textFinalAddress);
+        /*address1 = (EditText) findViewById(R.id.textDialogAddress1);
+        address2 = (EditText) findViewById(R.id.textDialogAddress2);
+        city = (EditText) findViewById(R.id.textDialogCity);
+        state = (EditText) findViewById(R.id.textDialogState);
+        zip = (EditText) findViewById(R.id.textDialogZip);*/
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //fab.setOnClickListener(new View.OnClickListener() {
             //@Override
@@ -50,5 +75,61 @@ public class HomeScreen extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void getAddressTextViewClick(View view) {
+// get prompts.xml view
+        LayoutInflater li = LayoutInflater.from(context);
+        View promptsView = li.inflate(R.layout.address_prompt, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                context);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText address1 = (EditText) promptsView
+                .findViewById(R.id.textDialogAddress1);
+        final EditText address2 = (EditText) promptsView
+                .findViewById(R.id.textDialogAddress2);
+        final EditText city = (EditText) promptsView
+                .findViewById(R.id.textDialogCity);
+        final EditText state = (EditText) promptsView
+                .findViewById(R.id.textDialogState);
+        final EditText zip = (EditText) promptsView
+                .findViewById(R.id.textDialogZip);
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // get user input and set it to result
+                                // edit text
+                                tempAddress1 = address1.getText().toString();
+                                tempAddress2 = address2.getText().toString();
+                                tempCity = city.getText().toString();
+                                tempState = state.getText().toString();
+                                tempZip = zip.getText().toString();
+
+                                finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
+                                + tempCity + ", " + tempState + ", " + tempZip);
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+
     }
 }

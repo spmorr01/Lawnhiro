@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/textDialogAddress1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Address 1">
+            </EditText>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/textDialogAddress2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Address 2">
+            </EditText>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/textDialogCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="City">
+            </EditText>
+
+            <EditText
+                android:id="@+id/textDialogState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="State">
+            </EditText>
+
+            <EditText
+                android:id="@+id/textDialogZip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Zip">
+            </EditText>
+
+        </TableRow>
+
+    </TableLayout>
+
+    <requestFocus />
+
+</LinearLayout>
