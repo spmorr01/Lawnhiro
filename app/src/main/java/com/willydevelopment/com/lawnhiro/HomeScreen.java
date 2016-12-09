@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class HomeScreen extends AppCompatActivity {
 
@@ -40,6 +43,9 @@ public class HomeScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         finalAddress = (EditText) findViewById(R.id.textFinalAddress);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         /*address1 = (EditText) findViewById(R.id.textDialogAddress1);
         address2 = (EditText) findViewById(R.id.textDialogAddress2);
         city = (EditText) findViewById(R.id.textDialogCity);
@@ -130,6 +136,35 @@ public class HomeScreen extends AppCompatActivity {
 
         // show it
         alertDialog.show();
+
+    }
+
+    public void getPriceButtonClick (View view) {
+        String addressBodyText;
+
+            addressBodyText = finalAddress.getText().toString();
+
+            Email m = new Email("spencermorris22@gmail.com", "sp00k1obli182$");
+            String[] toArray = {"jj_morris10@hotmail.com"};
+            m.setTo(toArray);
+            m.setFrom("test@lawnhiro.com");
+            m.setSubject("This is an email sent using my Mail JavaMail wrapper from an Android device.");
+            m.setBody(addressBodyText);
+
+            try {
+
+                if(m.send()) {
+                    Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
+                }
+            } catch(Exception e) {
+                //Toast.makeText(MailApp.this, "There was a problem sending the email.", Toast.LENGTH_LONG).show();
+                Log.e("HomeScreen", "Could not send email", e);
+            }
+
+
+
 
     }
 }
