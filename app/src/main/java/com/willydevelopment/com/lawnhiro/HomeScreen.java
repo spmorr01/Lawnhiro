@@ -202,8 +202,8 @@ public class HomeScreen extends AppCompatActivity {
             //System.out.println("----------------------------");
             for (int temp = 0; temp < nList.getLength(); temp++) {
                 Node nNode = nList.item(temp);
-                System.out.println("\nCurrent Element :"
-                        + nNode.getNodeName());
+                //System.out.println("\nCurrent Element :"
+                        //+ nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     //System.out.println("lotSizeSqFt "
@@ -211,6 +211,10 @@ public class HomeScreen extends AppCompatActivity {
                     price.setText("lotSizeSqFt : "
                             + eElement
                             .getElementsByTagName("lotSizeSqFt")
+                            .item(0)
+                            .getTextContent()
+                            + eElement
+                            .getElementsByTagName("finishedSqFt")
                             .item(0)
                             .getTextContent());
                 }
