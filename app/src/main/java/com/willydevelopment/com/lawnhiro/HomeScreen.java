@@ -23,6 +23,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.net.URL;
@@ -191,7 +192,30 @@ public class HomeScreen extends AppCompatActivity {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(conn.getInputStream());
 
-            nodes = doc.getElementsByTagName("result");
+            doc.getDocumentElement().normalize();
+            //System.out.println("Root element :"
+                    //+ doc.getDocumentElement().getNodeName());
+
+
+            NodeList nList = doc.getElementsByTagName("result");
+            //System.out.println(nList.getLength());
+            //System.out.println("----------------------------");
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+                System.out.println("\nCurrent Element :"
+                        + nNode.getNodeName());
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    //System.out.println("lotSizeSqFt "
+                    //+ eElement.getAttribute("lotSizeSqFt"));
+                    price.setText("lotSizeSqFt : "
+                            + eElement
+                            .getElementsByTagName("lotSizeSqFt")
+                            .item(0)
+                            .getTextContent());
+                }
+            }
+            /*nodes = doc.getElementsByTagName("result");
             //Log.println(1, "Nodes", nodes.toString());
             for (int i = 0; i < nodes.getLength(); i++) {
                 Element element = (Element) nodes.item(i);
@@ -199,7 +223,7 @@ public class HomeScreen extends AppCompatActivity {
                 Element line = (Element) title.item(0);
                 lotSize.add(line.getTextContent());
                 price.setText(lotSize.get(0).toString());
-            }
+            }*/
         }
         catch (Exception e) {
             e.printStackTrace();
