@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,7 +29,7 @@ import org.w3c.dom.NodeList;
 
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
+import java.net.URLEncoder;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,6 +51,12 @@ public class HomeScreen extends AppCompatActivity {
     private String tempState;
     private String tempZip;
     private String tempFinalAddress;
+
+    private String addressParams;
+    private String cityStateZipParams;
+
+    private int lotSize;
+    private int finishedSize;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -145,8 +152,15 @@ public class HomeScreen extends AppCompatActivity {
                                 tempState = state.getText().toString();
                                 tempZip = zip.getText().toString();
 
-                                finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
-                                        + tempCity + ", " + tempState + ", " + tempZip);
+                                if (TextUtils.isEmpty(tempAddress2)) {
+                                    finalAddress.setText(tempAddress1 + ", "
+                                            + tempCity + ", " + tempState + " " + tempZip);
+                                } else {
+                                    finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
+                                            + tempCity + ", " + tempState + " " + tempZip);
+                                }
+
+
                             }
                         })
                 .setNegativeButton("Cancel",
@@ -174,9 +188,6 @@ public class HomeScreen extends AppCompatActivity {
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
 
-        List lotSize = null;
-        NodeList nodes = null;
-
         final EditText orderNotes = (EditText) promptsView
                 .findViewById(R.id.textNotes);
 
@@ -184,9 +195,15 @@ public class HomeScreen extends AppCompatActivity {
                 .findViewById(R.id.textPrice);
 
         try {
+            if (TextUtils.isEmpty(tempAddress2)) {
+                addressParams = tempAddress1;
+            } else {
+                addressParams = tempAddress1 + ", " + tempAddress2 + ", ";
+            }
+            cityStateZipParams = tempCity + ", " + tempState + " " + tempZip;
 
-            URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=X1-ZWz1fafu2i84y3_1hdll&address=2735%20S%2037th%20Street&citystatezip=Lincoln+NE+68506");
-            URLConnection conn = url.openConnection();
+            URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=" + getString(R.string.zillow_api_key) + "&address=" + URLEncoder.encode(addressParams, "UTF-8") + "&citystatezip=" + URLEncoder.encode(cityStateZipParams, "UTF-8"));
+            URLConnection conn = url.openConnection(); //add citystatezip parameter!!!!
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -208,15 +225,12 @@ public class HomeScreen extends AppCompatActivity {
                     Element eElement = (Element) nNode;
                     //System.out.println("lotSizeSqFt "
                     //+ eElement.getAttribute("lotSizeSqFt"));
-                    price.setText("lotSizeSqFt : "
-                            + eElement
-                            .getElementsByTagName("lotSizeSqFt")
-                            .item(0)
-                            .getTextContent()
-                            + eElement
-                            .getElementsByTagName("finishedSqFt")
-                            .item(0)
-                            .getTextContent());
+
+                    lotSize = Integer.parseInt(eElement.getElementsByTagName("lotSizeSqFt").item(0).getTextContent());
+                    finishedSize = Integer.parseInt(eElement.getElementsByTagName("finishedSqFt").item(0).getTextContent());
+
+                    price.setText("lotSize : " + lotSize + " finishedSize : " + finishedSize);
+                    orderNotes.setText("Difference : " + (lotSize - finishedSize));
                 }
             }
             /*nodes = doc.getElementsByTagName("result");
