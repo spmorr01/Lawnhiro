@@ -227,113 +227,54 @@ public class HomeScreen extends AppCompatActivity {
                         //+ nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
-                    //System.out.println("lotSizeSqFt "
-                    //+ eElement.getAttribute("lotSizeSqFt"));
-
-                    /*const lotSize = results.lotSizeSqFt;
-                    const houseSize = results.finishedSqFt;
-                    const mowableSizeSqFt = lotSize - houseSize;
-                    -      let price = 25;
-                    +      let price = "contact us for price";
-                    +
-                            +      if ( mowableSizeSqFt> 500 && mowableSizeSqFt< 2000 )
-                        +        {price = 25}
-                                +      else if ( mowableSizeSqFt >= 2000 && mowableSizeSqFt < 3000 )
-                        +        {price = 27}
-                                +      else if ( mowableSizeSqFt >= 3000 && mowableSizeSqFt < 4000)
-                        +        {price = 30}
-                                +      else if ( mowableSizeSqFt >= 4000 && mowableSizeSqFt < 5000)
-                        +        {price = 33}
-                                +      else if ( mowableSizeSqFt >= 5000 && mowableSizeSqFt < 6000)
-                        +        {price = 36}
-                                +      else if ( mowableSizeSqFt >= 6000 && mowableSizeSqFt < 7000)
-                        +        {price = 39}
-                                +      else if ( mowableSizeSqFt >= 7000 && mowableSizeSqFt < 8000)
-                        +        {price = 41}
-                                +      else if ( mowableSizeSqFt >= 8000 && mowableSizeSqFt < 9000)
-                        +        {price = 43}
-                                +      else if ( mowableSizeSqFt >= 9000 && mowableSizeSqFt < 10000)
-                        +        {price = 45}
-                                +      else if ( mowableSizeSqFt >= 10000 && mowableSizeSqFt < 11000)
-                        +        {price = 47}
-                                +      else if ( mowableSizeSqFt >= 11000 && mowableSizeSqFt < 13000)
-                        +        {price = 49}
-                                +      else if ( mowableSizeSqFt >= 13000 && mowableSizeSqFt < 15000)
-                        +        {price = 54}
-                                +      else if ( mowableSizeSqFt >= 15000 && mowableSizeSqFt < 17000)
-                        +        {price = 58}
-                                +      else if ( mowableSizeSqFt >= 17000 && mowableSizeSqFt < 19000)
-                        +        {price = 62}
-                                +      else if ( mowableSizeSqFt >= 19000 && mowableSizeSqFt < 21000)
-                        +        {price = 67}
-                                +
-
-                                -      const extraSqFt = mowableSizeSqFt - 3000;
-                    -      const priceModifier = Math.floor(extraSqFt / 2000);
-
-                    -      if (priceModifier > 0) {
-                        -        price += priceModifier * 5; // add $5
-                        -      }
-
-                    res.json({price, id: priceMap[price]});
-                }).*/
-
 
                     lotSize = Integer.parseInt(eElement.getElementsByTagName("lotSizeSqFt").item(0).getTextContent());
                     finishedSize = Integer.parseInt(eElement.getElementsByTagName("finishedSqFt").item(0).getTextContent());
-                    mowableSize = lotSize - finishedSize;
-                    finalPrice = 25;
 
-                    if ( mowableSize> 500 && mowableSize< 2000 )
-                                {finalPrice = 25;}
-                    else if ( mowableSize >= 2000 && mowableSize < 3000 )
-                                {finalPrice = 27;}
-                                      else if ( mowableSize >= 3000 && mowableSize < 4000)
-                                {finalPrice = 30;}
-                                      else if ( mowableSize >= 4000 && mowableSize < 5000)
-                                {finalPrice = 33;}
-                                      else if ( mowableSize >= 5000 && mowableSize < 6000)
-                                {finalPrice = 36;}
-                                      else if ( mowableSize >= 6000 && mowableSize < 7000)
-                                {finalPrice = 39;}
-                                      else if ( mowableSize >= 7000 && mowableSize < 8000)
-                                {finalPrice = 41;}
-                                      else if ( mowableSize >= 8000 && mowableSize < 9000)
-                                {finalPrice = 43;}
-                                      else if ( mowableSize >= 9000 && mowableSize < 10000)
-                                {finalPrice = 45;}
-                                     else if ( mowableSize >= 10000 && mowableSize < 11000)
-                                {finalPrice = 47;}
-                                      else if ( mowableSize >= 11000 && mowableSize < 13000)
-                                {finalPrice = 49;}
-                                      else if ( mowableSize >= 13000 && mowableSize < 15000)
-                                {finalPrice = 54;}
-                                      else if ( mowableSize >= 15000 && mowableSize < 17000)
-                                {finalPrice = 58;}
-                                     else if ( mowableSize >= 17000 && mowableSize < 19000)
-                                {finalPrice = 62;}
-                                      else if ( mowableSize >= 19000 && mowableSize < 21000)
-                                {finalPrice = 67;}
-
-                    extraSqFt = mowableSize - 3000;
-                    priceModifier = Math.floor(extraSqFt / 2000);
-
-                    if (priceModifier > 0) {
-                        finalPrice += priceModifier * 5; // add $5
-                        }
-
-                    price.setText("$" + finalPrice);
                 }
             }
-            /*nodes = doc.getElementsByTagName("result");
-            //Log.println(1, "Nodes", nodes.toString());
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Element element = (Element) nodes.item(i);
-                NodeList title = element.getElementsByTagName("lotSizeSqFt");
-                Element line = (Element) title.item(0);
-                lotSize.add(line.getTextContent());
-                price.setText(lotSize.get(0).toString());
-            }*/
+
+            mowableSize = lotSize - finishedSize;
+            finalPrice = 25;
+
+            if ( mowableSize> 500 && mowableSize< 2000 )
+            {finalPrice = 25;}
+            else if ( mowableSize >= 2000 && mowableSize < 3000 )
+            {finalPrice = 27;}
+            else if ( mowableSize >= 3000 && mowableSize < 4000)
+            {finalPrice = 30;}
+            else if ( mowableSize >= 4000 && mowableSize < 5000)
+            {finalPrice = 33;}
+            else if ( mowableSize >= 5000 && mowableSize < 6000)
+            {finalPrice = 36;}
+            else if ( mowableSize >= 6000 && mowableSize < 7000)
+            {finalPrice = 39;}
+            else if ( mowableSize >= 7000 && mowableSize < 8000)
+            {finalPrice = 41;}
+            else if ( mowableSize >= 8000 && mowableSize < 9000)
+            {finalPrice = 43;}
+            else if ( mowableSize >= 9000 && mowableSize < 10000)
+            {finalPrice = 45;}
+            else if ( mowableSize >= 10000 && mowableSize < 11000)
+            {finalPrice = 47;}
+            else if ( mowableSize >= 11000 && mowableSize < 13000)
+            {finalPrice = 49;}
+            else if ( mowableSize >= 13000 && mowableSize < 15000)
+            {finalPrice = 54;}
+            else if ( mowableSize >= 15000 && mowableSize < 17000)
+            {finalPrice = 58;}
+            else if ( mowableSize >= 17000 && mowableSize < 19000)
+            {finalPrice = 62;}
+            else if ( mowableSize >= 19000 && mowableSize < 21000)
+            {finalPrice = 67;}
+
+            extraSqFt = mowableSize - 3000;
+            priceModifier = Math.floor(extraSqFt / 2000);
+
+            if (priceModifier > 0) {
+                finalPrice += priceModifier * 5; // add $5
+            }
+            price.setText("$" + finalPrice);
         }
         catch (Exception e) {
             e.printStackTrace();
