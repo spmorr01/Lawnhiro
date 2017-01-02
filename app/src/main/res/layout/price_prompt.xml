@@ -6,15 +6,6 @@
     android:orientation="vertical"
     android:padding="10dp" >
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/labelPrice"
@@ -35,11 +26,6 @@
                 android:text="">
             </TextView>
 
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/labelNotes"
@@ -55,10 +41,9 @@
             <EditText
                 android:id="@+id/textNotes"
                 android:background="@null"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="italic"
-                android:paddingRight="60dp"
                 android:paddingBottom="2dp"
                 android:inputType="textMultiLine"
                 android:scrollHorizontally="false"
@@ -66,10 +51,14 @@
                 android:textSize="12dp">
             </EditText>
 
-        </TableRow>
+    <Button
+        android:id="@+id/paypalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@mipmap/btn_xpresscheckout"
+        android:onClick="paypalButtonClick"/>
 
-
-    </TableLayout>
 
     <requestFocus />
 

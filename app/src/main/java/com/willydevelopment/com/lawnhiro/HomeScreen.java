@@ -8,7 +8,6 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +38,8 @@ public class HomeScreen extends AppCompatActivity {
     final Context context = this;
     private Button button;
     private EditText finalAddress;
+    //private EditText orderNotes;
+    //private TextView price;       //FINISHING ADDING ALL OF THESE AND CLEANING UP OTHER CODE!
     /*private EditText address1;
     private EditText address2;
     private EditText city;
@@ -61,6 +62,8 @@ public class HomeScreen extends AppCompatActivity {
     private int finalPrice;
     private int extraSqFt;
     private double priceModifier;
+    private String priceText;
+    private String addressBodyText;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -76,6 +79,7 @@ public class HomeScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         finalAddress = (EditText) findViewById(R.id.textFinalAddress);
+
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -275,101 +279,46 @@ public class HomeScreen extends AppCompatActivity {
                 finalPrice += priceModifier * 5; // add $5
             }
             price.setText("$" + finalPrice);
+
+            priceText = price.getText().toString();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
 
+        alertDialogBuilder.setCancelable(true);
 
-        /*try {
-            URL url = new URL(
-                    "http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=X1-ZWz1fafu2i84y3_1hdll&address=2735%20S%2037th%20Street&citystatezip=Lincoln+NE+68506");
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new InputSource(url.openStream()));
-            doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("result");
-*//** Assign textview array lenght by arraylist size *//*
-            //name = new TextView[nodeList.getLength()];
-            //website = new TextView[nodeList.getLength()];
-            //category = new TextView[nodeList.getLength()];
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                //name[i] = new TextView(this);
-                //website[i] = new TextView(this);
-                //category[i] = new TextView(this);
-                Element lotSizeElement = (Element) node;
-                NodeList nameList = lotSizeElement.getElementsByTagName("lotSizeSqFt");
-                Element nameElement = (Element) nameList.item(0);
-                nameList = nameElement.getChildNodes();
-                name[i].setText("Name = "
-                        + ((Node) nameList.item(0)).getNodeValue());
-                NodeList websiteList = fstElmnt.getElementsByTagName("website");
-                Element websiteElement = (Element) websiteList.item(0);
-                websiteList = websiteElement.getChildNodes();
-                website[i].setText("Website = "
-                        + ((Node) websiteList.item(0)).getNodeValue());
-                category[i].setText("Website Category = "
-                        + websiteElement.getAttribute("category"));
-                layout.addView(name[i]);
-                layout.addView(website[i]);
-                layout.addView(category[i]);
+        final Button paypalButton = (Button) promptsView.findViewById(R.id.paypalButton);
+        paypalButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                String addressBodyText;
+                String priceText;
+                String orderNotesText;
+
+                addressBodyText = finalAddress.getText().toString();
+                priceText = price.getText().toString();
+                orderNotesText = orderNotes.getText().toString();
+
+                Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
+                String[] toArray = {"jj_morris10@hotmail.com"};
+                m.setTo(toArray);
+                m.setFrom("test@lawnhiro.com");
+                m.setSubject("New Lawnhiro Order!");
+                m.setBody("Address: " + addressBodyText + "\n"
+                        + "Accepted Price: " + priceText + "\n"
+                        + "Order Notes: " + orderNotesText);
+
+                try {
+                    if (m.send()) {
+                        Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
+                }
             }
-        } catch (Exception e) {
-            System.out.println("XML Pasing Excpetion = " + e);
-        }
-*/
-
-
-        //price.setText(lotSize.get(0).toString());
-        //price.setText("$50");
-        //price.setText(nodes.getLength());
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("Accept",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // get user input and set it to result
-                                // edit text
-                                String addressBodyText;
-                                String priceText;
-                                String orderNotesText;
-
-                                addressBodyText = finalAddress.getText().toString();
-                                priceText = price.getText().toString();
-                                orderNotesText = orderNotes.getText().toString();
-
-                                Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
-                                String[] toArray = {"jj_morris10@hotmail.com"};
-                                m.setTo(toArray);
-                                m.setFrom("test@lawnhiro.com");
-                                m.setSubject("New Lawnhiro Order!");
-                                m.setBody("Address: " + addressBodyText + "\n"
-                                        + "Accepted Price: " + priceText + "\n"
-                                        + "Order Notes: " + orderNotesText);
-
-                                try {
-
-                                    if (m.send()) {
-                                        Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
-                                    }
-                                } catch (Exception e) {
-                                    //Toast.makeText(MailApp.this, "There was a problem sending the email.", Toast.LENGTH_LONG).show();
-                                    Log.e("HomeScreen", "Could not send email", e);
-                                }
-                            }
-                        })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
+        });
 
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -377,11 +326,4 @@ public class HomeScreen extends AppCompatActivity {
         // show it
         alertDialog.show();
     }
-
-    public void acceptPriceButtonClick(View view) {
-
-
-    }
-
-
 }
