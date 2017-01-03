@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.2.0'
     compile files('libs/activation.jar')
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    compile 'com.paypal.sdk:paypal-android-sdk:2.15.1'
 }

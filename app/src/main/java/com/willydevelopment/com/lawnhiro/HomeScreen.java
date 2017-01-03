@@ -1,13 +1,16 @@
 package com.willydevelopment.com.lawnhiro;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,14 +21,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
+import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -64,12 +72,15 @@ public class HomeScreen extends AppCompatActivity {
     private double priceModifier;
     private String priceText;
     private String addressBodyText;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client2;
+    private String orderNotesText;
 
+    private static PayPalConfiguration config = new PayPalConfiguration()
+
+            // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
+            // or live (ENVIRONMENT_PRODUCTION)
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+
+            .clientId("AeL5Z6IirMijkry6LzbZ8aS9E47B0AH2tHizjdJxrvMprG6X93w7w5I1zjJYQsOkYKzF0ZWLt5CcpkJ-");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +94,12 @@ public class HomeScreen extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        Intent paypalIntent = new Intent(this, PayPalService.class);
+
+        paypalIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+
+        startService(paypalIntent);
         /*address1 = (EditText) findViewById(R.id.textDialogAddress1);
         address2 = (EditText) findViewById(R.id.textDialogAddress2);
         city = (EditText) findViewById(R.id.textDialogCity);
@@ -96,9 +113,12 @@ public class HomeScreen extends AppCompatActivity {
         //        .setAction("Action", null).show();
         //}
         //});
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    @Override
+    public void onDestroy() {
+        stopService(new Intent(this, PayPalService.class));
+        super.onDestroy();
     }
 
     @Override
@@ -280,7 +300,7 @@ public class HomeScreen extends AppCompatActivity {
             }
             price.setText("$" + finalPrice);
 
-            priceText = price.getText().toString();
+
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -291,32 +311,25 @@ public class HomeScreen extends AppCompatActivity {
         final Button paypalButton = (Button) promptsView.findViewById(R.id.paypalButton);
         paypalButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                String addressBodyText;
-                String priceText;
-                String orderNotesText;
-
                 addressBodyText = finalAddress.getText().toString();
                 priceText = price.getText().toString();
                 orderNotesText = orderNotes.getText().toString();
 
-                Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
-                String[] toArray = {"jj_morris10@hotmail.com"};
-                m.setTo(toArray);
-                m.setFrom("test@lawnhiro.com");
-                m.setSubject("New Lawnhiro Order!");
-                m.setBody("Address: " + addressBodyText + "\n"
-                        + "Accepted Price: " + priceText + "\n"
-                        + "Order Notes: " + orderNotesText);
+                PayPalPayment payment = new PayPalPayment(new BigDecimal(finalPrice), "USD", "Lawnhiro Order",
+                        PayPalPayment.PAYMENT_INTENT_SALE);
 
-                try {
-                    if (m.send()) {
-                        Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
-                }
+                Intent intent = new Intent(v.getContext(), PaymentActivity.class);
+
+                // send the same configuration for restart resiliency
+                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+
+                intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+
+                startActivityForResult(intent, 0);
+
+
+
+
             }
         });
 
@@ -325,5 +338,51 @@ public class HomeScreen extends AppCompatActivity {
 
         // show it
         alertDialog.show();
+    }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+            if (confirm != null) {
+                try {
+                    Log.i("paymentExample", confirm.toJSONObject().toString(4));
+                    Toast.makeText(HomeScreen.this, "Payment successful", Toast.LENGTH_LONG).show();
+                    // TODO: send 'confirm' to your server for verification.
+                    // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
+                    // for more details.
+
+
+                    Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
+                    String[] toArray = {"jj_morris10@hotmail.com"};
+                    m.setTo(toArray);
+                    m.setFrom("test@lawnhiro.com");
+                    m.setSubject("New Lawnhiro Order!");
+                    m.setBody("Address: " + addressBodyText + "\n"
+                        + "Accepted Price: " + priceText + "\n"
+                        + "Order Notes: " + orderNotesText);
+
+                    try {
+                        if (m.send()) {
+                            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
+                }
+            }
+        }
+        else if (resultCode == Activity.RESULT_CANCELED) {
+            Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
+            Log.i("paymentExample", "The user canceled.");
+        }
+        else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+            Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
+            Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
+        }
     }
 }
