@@ -1,75 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="10dp" >
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/textDialogAddress1"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="Address 1">
             </EditText>
 
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
             <EditText
                 android:id="@+id/textDialogAddress2"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="Address 2">
             </EditText>
 
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <EditText
-                android:id="@+id/textDialogCity"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="City">
+                android:orientation="horizontal">
+            <EditText
+                android:id="@+id/textDialogCity"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Lincoln"
+                android:editable="false">
             </EditText>
 
             <EditText
                 android:id="@+id/textDialogState"
-                android:layout_width="match_parent"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:hint="State">
+                android:text="NE"
+                android:gravity="center"
+                android:editable="false">
             </EditText>
 
             <EditText
                 android:id="@+id/textDialogZip"
-                android:layout_width="match_parent"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
+                android:gravity="center"
+                android:maxLength="5"
                 android:hint="Zip">
             </EditText>
-
-        </TableRow>
-
-    </TableLayout>
+            </LinearLayout>
+</LinearLayout>
 
     <requestFocus />
 
-</LinearLayout>
+</RelativeLayout>
