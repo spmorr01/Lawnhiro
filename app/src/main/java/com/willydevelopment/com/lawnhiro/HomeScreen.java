@@ -28,11 +28,14 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
@@ -53,6 +56,8 @@ public class HomeScreen extends AppCompatActivity {
     private EditText city;
     private EditText state;
     private EditText zip;*/
+
+    private String jsonOutput;
 
     private String tempAddress1;
     private String tempAddress2;
@@ -95,16 +100,15 @@ public class HomeScreen extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        Intent paypalIntent = new Intent(this, PayPalService.class);
+        Intent paypalIntent = new Intent(this, PayPalService.class); //move this to where we actually  use paypal
 
         paypalIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 
         startService(paypalIntent);
-        /*address1 = (EditText) findViewById(R.id.textDialogAddress1);
-        address2 = (EditText) findViewById(R.id.textDialogAddress2);
-        city = (EditText) findViewById(R.id.textDialogCity);
-        state = (EditText) findViewById(R.id.textDialogState);
-        zip = (EditText) findViewById(R.id.textDialogZip);*/
+
+        getDefaultAddressInformation();
+
+
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //fab.setOnClickListener(new View.OnClickListener() {
         //@Override
@@ -137,6 +141,7 @@ public class HomeScreen extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show(); //Add settings layout item here
             return true;
         }
 
@@ -328,8 +333,6 @@ public class HomeScreen extends AppCompatActivity {
                 startActivityForResult(intent, 0);
 
 
-
-
             }
         });
 
@@ -384,5 +387,57 @@ public class HomeScreen extends AppCompatActivity {
             Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
             Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
         }
+
+    }
+
+    protected void getDefaultAddressInformation(){
+        jsonOutput = loadJSONFromAsset();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonOutput);
+
+            tempAddress1 = (String) jsonObject.get("Address1");
+            System.out.println(tempAddress1);
+            tempAddress2 = (String) jsonObject.get("Address2");
+            tempCity = (String) jsonObject.get("City");
+            tempState = (String) jsonObject.get("State");
+            tempZip = (String) jsonObject.get("Zip");
+
+            if (TextUtils.isEmpty(tempAddress2)) {
+                finalAddress.setText(tempAddress1 + ", "
+                        + tempCity + ", " + tempState + " " + tempZip);
+            } else {
+                finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
+                        + tempCity + ", " + tempState + " " + tempZip);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+
+            InputStream is = getAssets().open("default_address.json");
+
+            int size = is.available();
+
+            byte[] buffer = new byte[size];
+
+            is.read(buffer);
+
+            is.close();
+
+            json = new String(buffer, "UTF-8");
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+
     }
 }
