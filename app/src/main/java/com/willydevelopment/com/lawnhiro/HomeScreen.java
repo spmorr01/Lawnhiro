@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -34,8 +36,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
@@ -57,7 +58,15 @@ public class HomeScreen extends AppCompatActivity {
     private EditText state;
     private EditText zip;*/
 
+
+
+    private File pathToInternalStorage;
+
+
     private String jsonOutput;
+    private Boolean settingsSet;
+    private MediaScannerConnection msConn;
+    private File file;
 
     private String tempAddress1;
     private String tempAddress2;
@@ -94,6 +103,8 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        pathToInternalStorage = context.getFilesDir();
+        System.out.println("**!!**" + pathToInternalStorage);
         finalAddress = (EditText) findViewById(R.id.textFinalAddress);
 
 
@@ -106,7 +117,44 @@ public class HomeScreen extends AppCompatActivity {
 
         startService(paypalIntent);
 
-        getDefaultAddressInformation();
+
+        //Map settingsMap = settings.getAll();
+
+        //if (settings.contains("Address1")) {
+            getUserSettings();
+        //}
+
+
+
+        /*settingsSet = checkForSettingsFile();
+        if (settingsSet){
+            Toast.makeText(HomeScreen.this, "Settings are set.", Toast.LENGTH_LONG).show();
+            try {
+                //InputStream is = new FileInputStream(pathToInternalStorage + "/default_address.json");
+                //JsonFileReader settings = new JsonFileReader();
+                //jsonOutput = settings.loadJSONFromAsset(is);
+                String filePath = pathToInternalStorage + "/default_address.txt";
+                JSONParser parser = new JSONParser();
+                FileReader fileReader = new FileReader(filePath);
+                Object obj = parser.parse(fileReader);
+
+                JSONObject jsonObject = (JSONObject) obj;
+                getDefaultAddressInformation(jsonObject);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            Toast.makeText(HomeScreen.this, "NOT SET! Creating file", Toast.LENGTH_LONG).show();
+        }*/
+
+
+
+
 
 
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -141,7 +189,9 @@ public class HomeScreen extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show(); //Add settings layout item here
+            //Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show(); //Add settings layout item here
+            Intent i = new Intent(getBaseContext(), Settings.class);
+            startActivity(i);
             return true;
         }
 
@@ -390,11 +440,9 @@ public class HomeScreen extends AppCompatActivity {
 
     }
 
-    protected void getDefaultAddressInformation(){
-        jsonOutput = loadJSONFromAsset();
-
+    protected void getDefaultAddressInformation(JSONObject jsonObject){
         try {
-            JSONObject jsonObject = new JSONObject(jsonOutput);
+            //JSONObject jsonObject = new JSONObject(jsonFromFile);
 
             tempAddress1 = (String) jsonObject.get("Address1");
             System.out.println(tempAddress1);
@@ -416,28 +464,75 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
 
-    public String loadJSONFromAsset() {
-        String json = null;
-        try {
+/*    private boolean checkForSettingsFile(){
+        //String filePath = "/Users/<username>/Documents/lawnhiro_default_address.txt";
+        //msConn = new MediaScannerConnection(this.getApplicationContext(), this);
 
-            InputStream is = getAssets().open("default_address.json");
+        //File appDirectory = new File(pathToInternalStorage + "/documents/Lawnhiro");
+        // have the object build the directory structure, if needed.
+        //appDirectory.mkdirs();
+        file = new File(pathToInternalStorage, "default_address.txt");
 
-            int size = is.available();
-
-            byte[] buffer = new byte[size];
-
-            is.read(buffer);
-
-            is.close();
-
-            json = new String(buffer, "UTF-8");
-
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+        if(file.exists()) {
+            return true;
         }
-        return json;
+        else
+        {
+            try {
+                file.createNewFile();
+                //msConn.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }*/
 
+    private void getUserSettings() {
+        AddressPreferences addressPreference = new AddressPreferences();
+        SharedPreferences tempSettings = getSharedPreferences("LAWNHIRO_ADDRESS_PREFERENCES", MODE_PRIVATE);
+        String addressArray[] = new String[5];
+        addressArray = addressPreference.getAddressPreferences(tempSettings);
+
+        tempAddress1 = addressArray[0]; //settings.getString("Address1", "");
+        tempAddress2 = addressArray[1]; //settings.getString("Address2", "");
+        tempCity = addressArray[2]; //settings.getString("City", "");
+        tempState = addressArray[3]; //settings.getString("State", "");
+        tempZip = addressArray[4]; //settings.getString("Zip", "");
+
+        if (TextUtils.isEmpty(tempAddress1) && TextUtils.isEmpty(tempAddress2) && TextUtils.isEmpty(tempCity)
+                && TextUtils.isEmpty(tempState) && TextUtils.isEmpty(tempZip)) {
+            Toast.makeText(HomeScreen.this, "Nothing in settings. Creating now.", Toast.LENGTH_LONG).show();
+            addressPreference.setAddressPreferences(tempSettings, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+            /*SharedPreferences.Editor editSettings = tempSettings.edit();
+            //editSettings.clear();
+            editSettings.putString("Address1", tempAddress1); //Address1.getText().toString();
+            editSettings.putString("Address2", tempAddress2);
+            editSettings.putString("City", tempCity);
+            editSettings.putString("State", tempState);
+            editSettings.putString("Zip", tempZip);
+
+            editSettings.apply();*/
+        }
+
+        else if (TextUtils.isEmpty(tempAddress2)) {
+            finalAddress.setText(tempAddress1 + ", "
+                    + tempCity + ", " + tempState + " " + tempZip);
+        } else {
+            finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
+                    + tempCity + ", " + tempState + " " + tempZip);
+        }
+
+        Toast.makeText(HomeScreen.this, "Settings are set.", Toast.LENGTH_LONG).show();
     }
+
+    /*@Override
+    public void onMediaScannerConnected() {
+        msConn.scanFile(file.getAbsolutePath(), null);
+    }*/
+
+    /*@Override
+    public void onScanCompleted(String path, Uri uri) {
+        msConn.disconnect();
+    }*/
 }
