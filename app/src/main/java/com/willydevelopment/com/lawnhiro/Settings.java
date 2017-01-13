@@ -1,10 +1,12 @@
 package com.willydevelopment.com.lawnhiro;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
@@ -36,38 +38,38 @@ public class Settings extends AppCompatActivity {
         State = (EditText) findViewById(R.id.textSettingsDialogState);
         Zip = (EditText) findViewById(R.id.textSettingsDialogZip);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+        final AddressPreferences addressPreference = new AddressPreferences();
+        final SharedPreferences tempSettings = getSharedPreferences("LAWNHIRO_ADDRESS_PREFERENCES", MODE_PRIVATE);
+        String addressArray[];// = new String[5];
+        addressArray = addressPreference.getAddressPreferences(tempSettings);
+
+        tempAddress1 = addressArray[0]; //settings.getString("Address1", "");
+        tempAddress2 = addressArray[1]; //settings.getString("Address2", "");
+        tempCity = addressArray[2]; //settings.getString("City", "");
+        tempState = addressArray[3]; //settings.getString("State", "");
+        tempZip = addressArray[4]; //settings.getString("Zip", "");
+
+        Address1.setText(tempAddress1);
+        if (!TextUtils.isEmpty(tempAddress2)) {
+            Address2.setText(tempAddress2);
+        }
+        City.setText(tempCity);
+        State.setText(tempState);
+        Zip.setText(tempZip);
     }
 
     public void saveDefaultAddressInformationClick(View view) {
-        /*SharedPreferences settings = getSharedPreferences("LAWNHIRO_ADDRESS_PREFERENCES", MODE_PRIVATE);   //getPreferences(Context.MODE_PRIVATE);
-        Editor editSettings = settings.edit();
-        //editSettings.clear();
-        editSettings.putString("Address1", tempAddress1); //Address1.getText().toString();
-        editSettings.putString("Address2", tempAddress2);
-        editSettings.putString("City", tempCity);
-        editSettings.putString("State", tempState);
-        editSettings.putString("Zip", tempZip);
-
-        editSettings.apply();*/
-
         tempAddress1 = Address1.getText().toString();
         tempAddress2 = Address2.getText().toString();
-        tempCity = Zip.getText().toString();
+        tempCity = City.getText().toString();
         tempState = State.getText().toString();
         tempZip = Zip.getText().toString();
         setDefaultAddressInformation();
 
-        //Toast.makeText(Settings.this, "Settings set successfully!", Toast.LENGTH_LONG).show();
-        //JsonFileWriter JsonFileWriter = new JsonFileWriter(pathToInternalStorage, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
-    }
+        Intent intent=new Intent();
+        setResult(1,intent);
+        finish();//finishing activity
+        }
 
     public void setDefaultAddressInformation() {
         AddressPreferences addressPreference = new AddressPreferences();

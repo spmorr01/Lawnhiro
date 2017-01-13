@@ -30,7 +30,6 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -117,54 +116,7 @@ public class HomeScreen extends AppCompatActivity {
 
         startService(paypalIntent);
 
-
-        //Map settingsMap = settings.getAll();
-
-        //if (settings.contains("Address1")) {
             getUserSettings();
-        //}
-
-
-
-        /*settingsSet = checkForSettingsFile();
-        if (settingsSet){
-            Toast.makeText(HomeScreen.this, "Settings are set.", Toast.LENGTH_LONG).show();
-            try {
-                //InputStream is = new FileInputStream(pathToInternalStorage + "/default_address.json");
-                //JsonFileReader settings = new JsonFileReader();
-                //jsonOutput = settings.loadJSONFromAsset(is);
-                String filePath = pathToInternalStorage + "/default_address.txt";
-                JSONParser parser = new JSONParser();
-                FileReader fileReader = new FileReader(filePath);
-                Object obj = parser.parse(fileReader);
-
-                JSONObject jsonObject = (JSONObject) obj;
-                getDefaultAddressInformation(jsonObject);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            Toast.makeText(HomeScreen.this, "NOT SET! Creating file", Toast.LENGTH_LONG).show();
-        }*/
-
-
-
-
-
-
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        //fab.setOnClickListener(new View.OnClickListener() {
-        //@Override
-        //public void onClick(View view) {
-        //  Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-        //        .setAction("Action", null).show();
-        //}
-        //});
     }
 
     @Override
@@ -190,13 +142,66 @@ public class HomeScreen extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             //Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show(); //Add settings layout item here
-            Intent i = new Intent(getBaseContext(), Settings.class);
-            startActivity(i);
+            Intent i = new Intent(HomeScreen.this, Settings.class);
+            startActivityForResult(i, 1);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1) {
+            Toast.makeText(HomeScreen.this, "Settings set successfully!", Toast.LENGTH_LONG).show();
+            getUserSettings();
+        }
+
+        if (resultCode == Activity.RESULT_OK) {
+            PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+            if (confirm != null) {
+                try {
+                    Log.i("paymentExample", confirm.toJSONObject().toString(4));
+                    Toast.makeText(HomeScreen.this, "Payment successful", Toast.LENGTH_LONG).show();
+                    // TODO: send 'confirm' to your server for verification.
+                    // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
+                    // for more details.
+
+
+                    Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
+                    String[] toArray = {"jj_morris10@hotmail.com"};
+                    m.setTo(toArray);
+                    m.setFrom("test@lawnhiro.com");
+                    m.setSubject("New Lawnhiro Order!");
+                    m.setBody("Address: " + addressBodyText + "\n"
+                            + "Accepted Price: " + priceText + "\n"
+                            + "Order Notes: " + orderNotesText);
+
+                    try {
+                        if (m.send()) {
+                            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
+                }
+            }
+        }
+        else if (resultCode == Activity.RESULT_CANCELED) {
+            Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
+            Log.i("paymentExample", "The user canceled.");
+        }
+        else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+            Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
+            Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
+        }
+
+    }
+
 
 
     public void getAddressTextViewClick(View view) {
@@ -261,6 +266,8 @@ public class HomeScreen extends AppCompatActivity {
 
     }
 
+
+
     public void getPriceButtonClick(View view) {
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.price_prompt, null);
@@ -286,6 +293,8 @@ public class HomeScreen extends AppCompatActivity {
             cityStateZipParams = tempCity + ", " + tempState + " " + tempZip;
 
             URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=" + getString(R.string.zillow_api_key) + "&address=" + URLEncoder.encode(addressParams, "UTF-8") + "&citystatezip=" + URLEncoder.encode(cityStateZipParams, "UTF-8"));
+            System.out.println("************************" + url);
+
             URLConnection conn = url.openConnection(); //add citystatezip parameter!!!!
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -393,105 +402,10 @@ public class HomeScreen extends AppCompatActivity {
         alertDialog.show();
     }
 
-    @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
-            PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-            if (confirm != null) {
-                try {
-                    Log.i("paymentExample", confirm.toJSONObject().toString(4));
-                    Toast.makeText(HomeScreen.this, "Payment successful", Toast.LENGTH_LONG).show();
-                    // TODO: send 'confirm' to your server for verification.
-                    // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
-                    // for more details.
-
-
-                    Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
-                    String[] toArray = {"jj_morris10@hotmail.com"};
-                    m.setTo(toArray);
-                    m.setFrom("test@lawnhiro.com");
-                    m.setSubject("New Lawnhiro Order!");
-                    m.setBody("Address: " + addressBodyText + "\n"
-                        + "Accepted Price: " + priceText + "\n"
-                        + "Order Notes: " + orderNotesText);
-
-                    try {
-                        if (m.send()) {
-                            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
-                }
-            }
-        }
-        else if (resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
-            Log.i("paymentExample", "The user canceled.");
-        }
-        else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-            Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
-            Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
-        }
-
-    }
-
-    protected void getDefaultAddressInformation(JSONObject jsonObject){
-        try {
-            //JSONObject jsonObject = new JSONObject(jsonFromFile);
-
-            tempAddress1 = (String) jsonObject.get("Address1");
-            System.out.println(tempAddress1);
-            tempAddress2 = (String) jsonObject.get("Address2");
-            tempCity = (String) jsonObject.get("City");
-            tempState = (String) jsonObject.get("State");
-            tempZip = (String) jsonObject.get("Zip");
-
-            if (TextUtils.isEmpty(tempAddress2)) {
-                finalAddress.setText(tempAddress1 + ", "
-                        + tempCity + ", " + tempState + " " + tempZip);
-            } else {
-                finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
-                        + tempCity + ", " + tempState + " " + tempZip);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-/*    private boolean checkForSettingsFile(){
-        //String filePath = "/Users/<username>/Documents/lawnhiro_default_address.txt";
-        //msConn = new MediaScannerConnection(this.getApplicationContext(), this);
-
-        //File appDirectory = new File(pathToInternalStorage + "/documents/Lawnhiro");
-        // have the object build the directory structure, if needed.
-        //appDirectory.mkdirs();
-        file = new File(pathToInternalStorage, "default_address.txt");
-
-        if(file.exists()) {
-            return true;
-        }
-        else
-        {
-            try {
-                file.createNewFile();
-                //msConn.connect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }*/
-
     private void getUserSettings() {
-        AddressPreferences addressPreference = new AddressPreferences();
-        SharedPreferences tempSettings = getSharedPreferences("LAWNHIRO_ADDRESS_PREFERENCES", MODE_PRIVATE);
-        String addressArray[] = new String[5];
+        final AddressPreferences addressPreference = new AddressPreferences();
+        final SharedPreferences tempSettings = getSharedPreferences("LAWNHIRO_ADDRESS_PREFERENCES", MODE_PRIVATE);
+        String addressArray[];// = new String[5];
         addressArray = addressPreference.getAddressPreferences(tempSettings);
 
         tempAddress1 = addressArray[0]; //settings.getString("Address1", "");
@@ -502,17 +416,52 @@ public class HomeScreen extends AppCompatActivity {
 
         if (TextUtils.isEmpty(tempAddress1) && TextUtils.isEmpty(tempAddress2) && TextUtils.isEmpty(tempCity)
                 && TextUtils.isEmpty(tempState) && TextUtils.isEmpty(tempZip)) {
-            Toast.makeText(HomeScreen.this, "Nothing in settings. Creating now.", Toast.LENGTH_LONG).show();
-            addressPreference.setAddressPreferences(tempSettings, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
-            /*SharedPreferences.Editor editSettings = tempSettings.edit();
-            //editSettings.clear();
-            editSettings.putString("Address1", tempAddress1); //Address1.getText().toString();
-            editSettings.putString("Address2", tempAddress2);
-            editSettings.putString("City", tempCity);
-            editSettings.putString("State", tempState);
-            editSettings.putString("Zip", tempZip);
+            LayoutInflater li = LayoutInflater.from(context);
+            View promptsView = li.inflate(R.layout.set_default_address_prompt, null);
 
-            editSettings.apply();*/
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+
+            // set prompts.xml to alertdialog builder
+            alertDialogBuilder.setView(promptsView);
+
+            final EditText address1 = (EditText) promptsView
+                    .findViewById(R.id.textDialogAddress1);
+            final EditText address2 = (EditText) promptsView
+                    .findViewById(R.id.textDialogAddress2);
+            final EditText city = (EditText) promptsView
+                    .findViewById(R.id.textDialogCity);
+            final EditText state = (EditText) promptsView
+                    .findViewById(R.id.textDialogState);
+            final EditText zip = (EditText) promptsView
+                    .findViewById(R.id.textDialogZip);
+
+            // set dialog message
+            alertDialogBuilder
+                    .setCancelable(false)
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // get user input and set it to result
+                                    // edit text
+                                    tempAddress1 = address1.getText().toString();
+                                    tempAddress2 = address2.getText().toString();
+                                    tempCity = city.getText().toString();
+                                    tempState = state.getText().toString();
+                                    tempZip = zip.getText().toString();
+
+                                    addressPreference.setAddressPreferences(tempSettings, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+
+                                    Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
+                                    getUserSettings();
+                                }
+                            });
+
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // show it
+            alertDialog.show();
         }
 
         else if (TextUtils.isEmpty(tempAddress2)) {
@@ -522,17 +471,5 @@ public class HomeScreen extends AppCompatActivity {
             finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
                     + tempCity + ", " + tempState + " " + tempZip);
         }
-
-        Toast.makeText(HomeScreen.this, "Settings are set.", Toast.LENGTH_LONG).show();
     }
-
-    /*@Override
-    public void onMediaScannerConnected() {
-        msConn.scanFile(file.getAbsolutePath(), null);
-    }*/
-
-    /*@Override
-    public void onScanCompleted(String path, Uri uri) {
-        msConn.disconnect();
-    }*/
 }
