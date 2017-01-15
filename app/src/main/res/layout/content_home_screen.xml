@@ -28,8 +28,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:padding="20px"
-                android:background="#80FFFFFF">
+                android:padding="15px"
+                android:background="@drawable/order_information_background">
 
                 <TableRow
                     android:layout_width="wrap_content"
@@ -38,9 +38,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
                         android:textStyle="bold"
-                        android:text="\nOrdering a Lawnhiro is easy as \n"
+                        android:text="Ordering a Lawnhiro is easy as:"
+                        android:padding="20px"
                         android:id="@+id/titleTextView"
                         android:textSize="22dp"
                         android:textIsSelectable="false"
@@ -56,11 +56,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textStyle="italic"
-                        android:text="A.  Enter an address below to reveal your custom price instantly.\nB.  Add to cart\nC.  PayPal and you&apos;re done.\n\n*Every order receives:\n1.  Grass cut to 4&quot;\n2.  Light trim around structures\n3.  Blow grass clippings off driveways and sidewalks."
+                        android:text="A.  Enter an address below to reveal your custom price instantly\nB.  Add to cart\nC.  PayPal and you&apos;re done!\n\n*Every order receives:\n1.  Grass cut to 4&quot;\n2.  Light trim around structures\n3.  Blow grass clippings off driveways and sidewalks."
                         android:id="@+id/infoTextView"
-                        android:textSize="12dp"
+                        android:textSize="14dp"
                         android:textIsSelectable="false"
-                        android:editable="false"/>
+                        android:editable="false"
+                        android:paddingBottom="5dp" />
 
                 </TableRow>
             </TableLayout>
@@ -74,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:background="#FFFFFF">
+                android:background="@drawable/final_address_background">
 
                 <TableRow
                     android:layout_width="wrap_content"
@@ -121,4 +122,41 @@
             </TableLayout>
         </TableRow>
     </TableLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="0dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Powered by:"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="15dp"
+                android:src="@mipmap/zillow_logo"
+                android:paddingRight="5dp"/>
+
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="20dp"
+                android:paddingLeft="5dp"
+                android:src="@mipmap/paypal_logo_large"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 </RelativeLayout>

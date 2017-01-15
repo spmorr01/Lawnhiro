@@ -2,6 +2,7 @@ package com.willydevelopment.com.lawnhiro;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -56,7 +58,6 @@ public class HomeScreen extends AppCompatActivity {
     private EditText city;
     private EditText state;
     private EditText zip;*/
-
 
 
     private File pathToInternalStorage;
@@ -116,7 +117,7 @@ public class HomeScreen extends AppCompatActivity {
 
         startService(paypalIntent);
 
-            getUserSettings();
+        getUserSettings();
     }
 
     @Override
@@ -151,8 +152,8 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 100) {
             Toast.makeText(HomeScreen.this, "Settings set successfully!", Toast.LENGTH_LONG).show();
             getUserSettings();
         }
@@ -179,29 +180,36 @@ public class HomeScreen extends AppCompatActivity {
 
                     try {
                         if (m.send()) {
-                            Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
+                        Log.e("email", "email didn't send: ", e);
                         Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
                     }
+
+                    NotificationCompat.Builder nBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("Lawnhiro")
+                            .setContentText("Your order has been sent successfully");
+
+                    NotificationManager nNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    nNotificationManager.notify(1, nBuilder.build());
+                    //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
                 } catch (JSONException e) {
                     Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
                 }
             }
-        }
-        else if (resultCode == Activity.RESULT_CANCELED) {
+        } else if (requestCode == 0 && resultCode == Activity.RESULT_CANCELED) {
             Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
             Log.i("paymentExample", "The user canceled.");
-        }
-        else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+        } else if (requestCode == 0 && resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
             Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
             Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
         }
 
     }
-
 
 
     public void getAddressTextViewClick(View view) {
@@ -267,7 +275,6 @@ public class HomeScreen extends AppCompatActivity {
     }
 
 
-
     public void getPriceButtonClick(View view) {
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.price_prompt, null);
@@ -284,6 +291,7 @@ public class HomeScreen extends AppCompatActivity {
         final TextView price = (TextView) promptsView
                 .findViewById(R.id.textPrice);
 
+
         try {
             if (TextUtils.isEmpty(tempAddress2)) {
                 addressParams = tempAddress1;
@@ -293,7 +301,6 @@ public class HomeScreen extends AppCompatActivity {
             cityStateZipParams = tempCity + ", " + tempState + " " + tempZip;
 
             URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=" + getString(R.string.zillow_api_key) + "&address=" + URLEncoder.encode(addressParams, "UTF-8") + "&citystatezip=" + URLEncoder.encode(cityStateZipParams, "UTF-8"));
-            System.out.println("************************" + url);
 
             URLConnection conn = url.openConnection(); //add citystatezip parameter!!!!
 
@@ -303,16 +310,20 @@ public class HomeScreen extends AppCompatActivity {
 
             doc.getDocumentElement().normalize();
             //System.out.println("Root element :"
-                    //+ doc.getDocumentElement().getNodeName());
+            //+ doc.getDocumentElement().getNodeName());
 
 
             NodeList nList = doc.getElementsByTagName("result");
-            //System.out.println(nList.getLength());
-            //System.out.println("----------------------------");
+
+        //System.out.println(nList.getLength());
+        //System.out.println("----------------------------");
+        if (nList.getLength() == 0) {
+            Toast.makeText(HomeScreen.this, "Unable to resolve address information. Please try again!", Toast.LENGTH_LONG).show();
+        } else {
             for (int temp = 0; temp < nList.getLength(); temp++) {
                 Node nNode = nList.item(temp);
                 //System.out.println("\nCurrent Element :"
-                        //+ nNode.getNodeName());
+                //+ nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
 
@@ -322,39 +333,41 @@ public class HomeScreen extends AppCompatActivity {
                 }
             }
 
+
             mowableSize = lotSize - finishedSize;
             finalPrice = 25;
 
-            if ( mowableSize> 500 && mowableSize< 2000 )
-            {finalPrice = 25;}
-            else if ( mowableSize >= 2000 && mowableSize < 3000 )
-            {finalPrice = 27;}
-            else if ( mowableSize >= 3000 && mowableSize < 4000)
-            {finalPrice = 30;}
-            else if ( mowableSize >= 4000 && mowableSize < 5000)
-            {finalPrice = 33;}
-            else if ( mowableSize >= 5000 && mowableSize < 6000)
-            {finalPrice = 36;}
-            else if ( mowableSize >= 6000 && mowableSize < 7000)
-            {finalPrice = 39;}
-            else if ( mowableSize >= 7000 && mowableSize < 8000)
-            {finalPrice = 41;}
-            else if ( mowableSize >= 8000 && mowableSize < 9000)
-            {finalPrice = 43;}
-            else if ( mowableSize >= 9000 && mowableSize < 10000)
-            {finalPrice = 45;}
-            else if ( mowableSize >= 10000 && mowableSize < 11000)
-            {finalPrice = 47;}
-            else if ( mowableSize >= 11000 && mowableSize < 13000)
-            {finalPrice = 49;}
-            else if ( mowableSize >= 13000 && mowableSize < 15000)
-            {finalPrice = 54;}
-            else if ( mowableSize >= 15000 && mowableSize < 17000)
-            {finalPrice = 58;}
-            else if ( mowableSize >= 17000 && mowableSize < 19000)
-            {finalPrice = 62;}
-            else if ( mowableSize >= 19000 && mowableSize < 21000)
-            {finalPrice = 67;}
+            if (mowableSize > 500 && mowableSize < 2000) {
+                finalPrice = 25;
+            } else if (mowableSize >= 2000 && mowableSize < 3000) {
+                finalPrice = 27;
+            } else if (mowableSize >= 3000 && mowableSize < 4000) {
+                finalPrice = 30;
+            } else if (mowableSize >= 4000 && mowableSize < 5000) {
+                finalPrice = 33;
+            } else if (mowableSize >= 5000 && mowableSize < 6000) {
+                finalPrice = 36;
+            } else if (mowableSize >= 6000 && mowableSize < 7000) {
+                finalPrice = 39;
+            } else if (mowableSize >= 7000 && mowableSize < 8000) {
+                finalPrice = 41;
+            } else if (mowableSize >= 8000 && mowableSize < 9000) {
+                finalPrice = 43;
+            } else if (mowableSize >= 9000 && mowableSize < 10000) {
+                finalPrice = 45;
+            } else if (mowableSize >= 10000 && mowableSize < 11000) {
+                finalPrice = 47;
+            } else if (mowableSize >= 11000 && mowableSize < 13000) {
+                finalPrice = 49;
+            } else if (mowableSize >= 13000 && mowableSize < 15000) {
+                finalPrice = 54;
+            } else if (mowableSize >= 15000 && mowableSize < 17000) {
+                finalPrice = 58;
+            } else if (mowableSize >= 17000 && mowableSize < 19000) {
+                finalPrice = 62;
+            } else if (mowableSize >= 19000 && mowableSize < 21000) {
+                finalPrice = 67;
+            }
 
             extraSqFt = mowableSize - 3000;
             priceModifier = Math.floor(extraSqFt / 2000);
@@ -365,12 +378,13 @@ public class HomeScreen extends AppCompatActivity {
             price.setText("$" + finalPrice);
 
 
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
 
         alertDialogBuilder.setCancelable(true);
+
+        // create alert dialog
+        final AlertDialog alertDialog = alertDialogBuilder.create();
 
         final Button paypalButton = (Button) promptsView.findViewById(R.id.paypalButton);
         paypalButton.setOnClickListener(new Button.OnClickListener() {
@@ -391,16 +405,20 @@ public class HomeScreen extends AppCompatActivity {
 
                 startActivityForResult(intent, 0);
 
+                alertDialog.dismiss();
 
             }
         });
 
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
 
         // show it
         alertDialog.show();
     }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+}
 
     private void getUserSettings() {
         final AddressPreferences addressPreference = new AddressPreferences();

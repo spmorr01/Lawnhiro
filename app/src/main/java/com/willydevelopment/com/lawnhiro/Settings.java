@@ -67,7 +67,7 @@ public class Settings extends AppCompatActivity {
         setDefaultAddressInformation();
 
         Intent intent=new Intent();
-        setResult(1,intent);
+        setResult(100);
         finish();//finishing activity
         }
 
