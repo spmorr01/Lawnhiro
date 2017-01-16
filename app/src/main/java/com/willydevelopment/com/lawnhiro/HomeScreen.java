@@ -317,7 +317,6 @@ public class HomeScreen extends AppCompatActivity {
 
             // show it
             alertDialog.show();
-
         }
 }
 
