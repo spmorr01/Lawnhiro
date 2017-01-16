@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -32,58 +31,28 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 public class HomeScreen extends AppCompatActivity {
 
     final Context context = this;
-    private Button button;
     private EditText finalAddress;
-    //private EditText orderNotes;
-    //private TextView price;       //FINISHING ADDING ALL OF THESE AND CLEANING UP OTHER CODE!
-    /*private EditText address1;
-    private EditText address2;
-    private EditText city;
-    private EditText state;
-    private EditText zip;*/
-
-
-    private File pathToInternalStorage;
-
-
-    private String jsonOutput;
-    private Boolean settingsSet;
-    private MediaScannerConnection msConn;
-    private File file;
 
     private String tempAddress1;
     private String tempAddress2;
     private String tempCity;
     private String tempState;
     private String tempZip;
-    private String tempFinalAddress;
-
-    private String addressParams;
-    private String cityStateZipParams;
 
     private int lotSize;
     private int finishedSize;
     private int mowableSize;
     private int finalPrice;
-    private int extraSqFt;
-    private double priceModifier;
+
     private String priceText;
     private String addressBodyText;
     private String orderNotesText;
@@ -103,19 +72,13 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        pathToInternalStorage = context.getFilesDir();
-        System.out.println("**!!**" + pathToInternalStorage);
         finalAddress = (EditText) findViewById(R.id.textFinalAddress);
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        Intent paypalIntent = new Intent(this, PayPalService.class); //move this to where we actually  use paypal
 
-        paypalIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-
-        startService(paypalIntent);
 
         getUserSettings();
     }
@@ -186,7 +149,7 @@ public class HomeScreen extends AppCompatActivity {
                         }
                     } catch (Exception e) {
                         Log.e("email", "email didn't send: ", e);
-                        Toast.makeText(HomeScreen.this, "There was a problem sending the email Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(HomeScreen.this, "There was a problem sending the email. Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
                     }
 
                     NotificationCompat.Builder nBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
@@ -291,37 +254,16 @@ public class HomeScreen extends AppCompatActivity {
         final TextView price = (TextView) promptsView
                 .findViewById(R.id.textPrice);
 
+        PriceCalculator priceCalculator = new PriceCalculator();
+        ZillowCaller zillowCaller = new ZillowCaller();
 
-        try {
-            if (TextUtils.isEmpty(tempAddress2)) {
-                addressParams = tempAddress1;
-            } else {
-                addressParams = tempAddress1 + ", " + tempAddress2 + ", ";
-            }
-            cityStateZipParams = tempCity + ", " + tempState + " " + tempZip;
+        NodeList nodeList = zillowCaller.GetZillowAPIData(context, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
 
-            URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=" + getString(R.string.zillow_api_key) + "&address=" + URLEncoder.encode(addressParams, "UTF-8") + "&citystatezip=" + URLEncoder.encode(cityStateZipParams, "UTF-8"));
-
-            URLConnection conn = url.openConnection(); //add citystatezip parameter!!!!
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(conn.getInputStream());
-
-            doc.getDocumentElement().normalize();
-            //System.out.println("Root element :"
-            //+ doc.getDocumentElement().getNodeName());
-
-
-            NodeList nList = doc.getElementsByTagName("result");
-
-        //System.out.println(nList.getLength());
-        //System.out.println("----------------------------");
-        if (nList.getLength() == 0) {
+        if (nodeList.getLength() == 0) {
             Toast.makeText(HomeScreen.this, "Unable to resolve address information. Please try again!", Toast.LENGTH_LONG).show();
         } else {
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
+            for (int temp = 0; temp < nodeList.getLength(); temp++) {
+                Node nNode = nodeList.item(temp);
                 //System.out.println("\nCurrent Element :"
                 //+ nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -335,89 +277,48 @@ public class HomeScreen extends AppCompatActivity {
 
 
             mowableSize = lotSize - finishedSize;
-            finalPrice = 25;
-
-            if (mowableSize > 500 && mowableSize < 2000) {
-                finalPrice = 25;
-            } else if (mowableSize >= 2000 && mowableSize < 3000) {
-                finalPrice = 27;
-            } else if (mowableSize >= 3000 && mowableSize < 4000) {
-                finalPrice = 30;
-            } else if (mowableSize >= 4000 && mowableSize < 5000) {
-                finalPrice = 33;
-            } else if (mowableSize >= 5000 && mowableSize < 6000) {
-                finalPrice = 36;
-            } else if (mowableSize >= 6000 && mowableSize < 7000) {
-                finalPrice = 39;
-            } else if (mowableSize >= 7000 && mowableSize < 8000) {
-                finalPrice = 41;
-            } else if (mowableSize >= 8000 && mowableSize < 9000) {
-                finalPrice = 43;
-            } else if (mowableSize >= 9000 && mowableSize < 10000) {
-                finalPrice = 45;
-            } else if (mowableSize >= 10000 && mowableSize < 11000) {
-                finalPrice = 47;
-            } else if (mowableSize >= 11000 && mowableSize < 13000) {
-                finalPrice = 49;
-            } else if (mowableSize >= 13000 && mowableSize < 15000) {
-                finalPrice = 54;
-            } else if (mowableSize >= 15000 && mowableSize < 17000) {
-                finalPrice = 58;
-            } else if (mowableSize >= 17000 && mowableSize < 19000) {
-                finalPrice = 62;
-            } else if (mowableSize >= 19000 && mowableSize < 21000) {
-                finalPrice = 67;
-            }
-
-            extraSqFt = mowableSize - 3000;
-            priceModifier = Math.floor(extraSqFt / 2000);
-
-            if (priceModifier > 0) {
-                finalPrice += priceModifier * 5; // add $5
-            }
+            finalPrice = priceCalculator.CalculatePrice(mowableSize);
             price.setText("$" + finalPrice);
 
+            alertDialogBuilder.setCancelable(true);
 
+            // create alert dialog
+            final AlertDialog alertDialog = alertDialogBuilder.create();
 
+            final Button paypalButton = (Button) promptsView.findViewById(R.id.paypalButton);
+            paypalButton.setOnClickListener(new Button.OnClickListener() {
+                public void onClick(View v) {
+                    Intent paypalIntent = new Intent(HomeScreen.this, PayPalService.class); //move this to where we actually  use paypal
 
+                    paypalIntent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 
-        alertDialogBuilder.setCancelable(true);
+                    startService(paypalIntent);
 
-        // create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
+                    addressBodyText = finalAddress.getText().toString();
+                    priceText = price.getText().toString();
+                    orderNotesText = orderNotes.getText().toString();
 
-        final Button paypalButton = (Button) promptsView.findViewById(R.id.paypalButton);
-        paypalButton.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                addressBodyText = finalAddress.getText().toString();
-                priceText = price.getText().toString();
-                orderNotesText = orderNotes.getText().toString();
+                    PayPalPayment payment = new PayPalPayment(new BigDecimal(finalPrice), "USD", "Lawnhiro Order",
+                            PayPalPayment.PAYMENT_INTENT_SALE);
 
-                PayPalPayment payment = new PayPalPayment(new BigDecimal(finalPrice), "USD", "Lawnhiro Order",
-                        PayPalPayment.PAYMENT_INTENT_SALE);
+                    Intent intent = new Intent(v.getContext(), PaymentActivity.class);
 
-                Intent intent = new Intent(v.getContext(), PaymentActivity.class);
+                    // send the same configuration for restart resiliency
+                    intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 
-                // send the same configuration for restart resiliency
-                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+                    intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
 
-                intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+                    startActivityForResult(intent, 0);
 
-                startActivityForResult(intent, 0);
+                    alertDialog.dismiss();
 
-                alertDialog.dismiss();
+                }
+            });
 
-            }
-        });
+            // show it
+            alertDialog.show();
 
-
-        // show it
-        alertDialog.show();
-    }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
 }
 
     private void getUserSettings() {
