@@ -56,8 +56,6 @@
         android:layout_gravity="center"
         android:background="@mipmap/btn_xpresscheckout"
         android:onClick="paypalButtonClick"/>
-
-
     <requestFocus />
 
 </LinearLayout>

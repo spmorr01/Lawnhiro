@@ -42,6 +42,8 @@ public class HomeScreen extends AppCompatActivity {
     final Context context = this;
     private EditText finalAddress;
 
+    private String tempName;
+    private String tempEmail;
     private String tempAddress1;
     private String tempAddress2;
     private String tempCity;
@@ -326,13 +328,15 @@ public class HomeScreen extends AppCompatActivity {
         String addressArray[];// = new String[5];
         addressArray = addressPreference.getAddressPreferences(tempSettings);
 
-        tempAddress1 = addressArray[0]; //settings.getString("Address1", "");
-        tempAddress2 = addressArray[1]; //settings.getString("Address2", "");
-        tempCity = addressArray[2]; //settings.getString("City", "");
-        tempState = addressArray[3]; //settings.getString("State", "");
-        tempZip = addressArray[4]; //settings.getString("Zip", "");
+        tempName = addressArray[0];
+        tempEmail = addressArray[1];
+        tempAddress1 = addressArray[2]; //settings.getString("Address1", "");
+        tempAddress2 = addressArray[3]; //settings.getString("Address2", "");
+        tempCity = addressArray[4]; //settings.getString("City", "");
+        tempState = addressArray[5]; //settings.getString("State", "");
+        tempZip = addressArray[6]; //settings.getString("Zip", "");
 
-        if (TextUtils.isEmpty(tempAddress1) && TextUtils.isEmpty(tempAddress2) && TextUtils.isEmpty(tempCity)
+        if (TextUtils.isEmpty(tempName) && TextUtils.isEmpty(tempEmail) && TextUtils.isEmpty(tempAddress1) && TextUtils.isEmpty(tempAddress2) && TextUtils.isEmpty(tempCity)
                 && TextUtils.isEmpty(tempState) && TextUtils.isEmpty(tempZip)) {
             LayoutInflater li = LayoutInflater.from(context);
             View promptsView = li.inflate(R.layout.set_default_address_prompt, null);
@@ -343,6 +347,10 @@ public class HomeScreen extends AppCompatActivity {
             // set prompts.xml to alertdialog builder
             alertDialogBuilder.setView(promptsView);
 
+            final EditText name = (EditText) promptsView
+                    .findViewById(R.id.textDialogName);
+            final EditText email = (EditText) promptsView
+                    .findViewById(R.id.textDialogEmail);
             final EditText address1 = (EditText) promptsView
                     .findViewById(R.id.textDialogAddress1);
             final EditText address2 = (EditText) promptsView
@@ -362,13 +370,15 @@ public class HomeScreen extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int id) {
                                     // get user input and set it to result
                                     // edit text
+                                    tempName = name.getText().toString();
+                                    tempEmail = email.getText().toString();
                                     tempAddress1 = address1.getText().toString();
                                     tempAddress2 = address2.getText().toString();
                                     tempCity = city.getText().toString();
                                     tempState = state.getText().toString();
                                     tempZip = zip.getText().toString();
 
-                                    addressPreference.setAddressPreferences(tempSettings, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+                                    addressPreference.setAddressPreferences(tempSettings, tempName, tempEmail, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
 
                                     Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
                                     getUserSettings();

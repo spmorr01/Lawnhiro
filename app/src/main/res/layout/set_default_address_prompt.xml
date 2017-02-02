@@ -37,6 +37,20 @@
             android:text="*Note: You can change your default address in 'Settings'"/>
 
         <EditText
+            android:id="@+id/textDialogName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name">
+        </EditText>
+
+        <EditText
+            android:id="@+id/textDialogEmail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email">
+        </EditText>
+
+        <EditText
             android:id="@+id/textDialogAddress1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
