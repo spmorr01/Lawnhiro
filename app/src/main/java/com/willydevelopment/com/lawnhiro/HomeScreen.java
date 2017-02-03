@@ -132,7 +132,13 @@ public class HomeScreen extends AppCompatActivity {
                     // TODO: send 'confirm' to your server for verification.
                     // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
                     // for more details.
+                    AddOrder addOrder = new AddOrder();
+                    boolean orderAdded = addOrder.addOrderToLawnhiro(context.getString(R.string.mobile_api_url), tempName, tempEmail, tempAddress1, tempAddress2, tempCity,
+                            tempState, tempZip, mowableSize, finalPrice, orderNotesText);
 
+                    if (orderAdded) {
+                        Toast.makeText(HomeScreen.this, "Order added successfully!", Toast.LENGTH_LONG).show();
+                    }
 
                     Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
                     String[] toArray = {"jj_morris10@hotmail.com"};
