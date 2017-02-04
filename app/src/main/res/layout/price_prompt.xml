@@ -5,6 +5,15 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="10dp" >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerInParent="true">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/labelPrice"
                 android:layout_width="wrap_content"
@@ -33,7 +42,7 @@
                 android:textStyle="bold"
                 android:textSize="16dp"
                 android:paddingRight="10dp"
-                android:text="Notes:"
+                android:text="Notes (Optional):"
                 />
 
             <EditText
@@ -49,6 +58,24 @@
                 android:textSize="12dp">
             </EditText>
 
+    <TextView
+        android:id="@+id/labelBusinessSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:textSize="16dp"
+        android:paddingRight="10dp"
+        android:text="How did you hear about us?*:"
+        />
+
+    <Spinner
+        android:id="@+id/businessSource"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/business_sources"
+        android:spinnerMode="dropdown" />
+
     <Button
         android:id="@+id/paypalButton"
         android:layout_width="150dp"
@@ -56,6 +83,9 @@
         android:layout_gravity="center"
         android:background="@mipmap/btn_xpresscheckout"
         android:onClick="paypalButtonClick"/>
+        </LinearLayout>
+    </ScrollView>
+
     <requestFocus />
 
 </LinearLayout>

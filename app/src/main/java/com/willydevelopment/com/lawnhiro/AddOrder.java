@@ -15,8 +15,8 @@ import java.net.URL;
 public class AddOrder {
     private boolean addSuccess;
 
-    public boolean addOrderToLawnhiro(String webApiHttp, String tempName, String tempEmail, String tempAddress1, String tempAddress2,
-                                        String tempCity, String tempState, String tempZip, int mowableSize, int finalPrice, String orderNotes) {
+    public boolean addOrderToLawnhiro(String webApiHttp, String tempBusinessSource, String tempPayPalOrderID, String tempName, String tempEmail, String tempAddress1, String tempAddress2,
+                                        String tempCity, String tempState, String tempZip, int mowableSize, int finalPrice, String tempServiceType, String orderNotes) {
 
 
 
@@ -42,8 +42,8 @@ public class AddOrder {
 
             //Create JSONObject here
             JSONObject jsonParam = new JSONObject();
-            jsonParam.put("BusinessSource", "Facebook");
-            jsonParam.put("PayPalOrderID", "PAY-123123");
+            jsonParam.put("BusinessSource", tempBusinessSource);
+            jsonParam.put("PayPalOrderID", tempPayPalOrderID);
             jsonParam.put("Name", tempName);
             jsonParam.put("Email", tempEmail);
             jsonParam.put("Address1", tempAddress1);
@@ -51,7 +51,7 @@ public class AddOrder {
             jsonParam.put("City", tempCity);
             jsonParam.put("State", tempState);
             jsonParam.put("Zip", tempZip);
-            jsonParam.put("ServiceType", "Lawnhiro");
+            jsonParam.put("ServiceType", tempServiceType);
             jsonParam.put("CalculationResultArea", mowableSize); //Area here
             jsonParam.put("CalculationResultPrice", finalPrice); //Price here
             jsonParam.put("CustomerNotes", orderNotes);
