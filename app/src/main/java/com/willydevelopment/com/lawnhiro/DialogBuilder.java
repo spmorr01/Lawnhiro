@@ -3,6 +3,7 @@ package com.willydevelopment.com.lawnhiro;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.widget.Toast;
 
 /**
  * Created by JJ on 2/4/17.
@@ -23,5 +24,9 @@ public class DialogBuilder {
 
                     }
                 });
+    }
+
+    public void Toaster(Context context, String tempToastMessage) {
+        Toast.makeText(context, tempToastMessage, Toast.LENGTH_LONG).show();
     }
 }

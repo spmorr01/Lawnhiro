@@ -63,6 +63,8 @@ public class HomeScreen extends AppCompatActivity {
 
     private String payPalOrderID;
 
+    DialogBuilder dialogBuilder;
+
     private static PayPalConfiguration config = new PayPalConfiguration()
 
             // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
@@ -78,6 +80,7 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        dialogBuilder = new DialogBuilder();
         finalAddress = (EditText) findViewById(R.id.textFinalAddress);
 
 
@@ -122,6 +125,7 @@ public class HomeScreen extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String tempToastMessage;
         if (resultCode == 100) {
             Toast.makeText(HomeScreen.this, "Settings set successfully!", Toast.LENGTH_LONG).show();
             getUserSettings();
@@ -135,7 +139,9 @@ public class HomeScreen extends AppCompatActivity {
                     payPalOrderID = confirm.toJSONObject().getJSONObject("response").getString("id");
                     String responseState = confirm.toJSONObject().getJSONObject("response").getString("state");
                     if (responseState.equals("approved")) {
-                        Toast.makeText(HomeScreen.this, "Payment successful", Toast.LENGTH_LONG).show();
+                        tempToastMessage = "Payment successful!";
+                        dialogBuilder.Toaster(context, tempToastMessage);
+                        //Toast.makeText(HomeScreen.this, "Payment successful", Toast.LENGTH_LONG).show();
                         // TODO: send 'confirm' to your server for verification.
                         // see https://developer.paypal.com/webapps/developer/docs/integration/mobile/verify-mobile-payment/
                         // for more details.
@@ -143,8 +149,17 @@ public class HomeScreen extends AppCompatActivity {
                         boolean orderAdded = addOrder.addOrderToLawnhiro(context.getString(R.string.mobile_api_url), businessSourceSelection, payPalOrderID, tempName, tempEmail, tempAddress1, tempAddress2, tempCity,
                                 tempState, tempZip, mowableSize, finalPrice, "Lawnhiro", orderNotesText);
 
-                        if (orderAdded) {
-                            Toast.makeText(HomeScreen.this, "Order added successfully!", Toast.LENGTH_LONG).show();
+                        if (!orderAdded) {
+                            //Toast.makeText(HomeScreen.this, "Order added successfully!", Toast.LENGTH_LONG).show();
+                            String tempDialogMessage = "There was unfortunate error when submitting the completed order to Lawnhior. Please" +
+                                    "contact Lawnhiro as soon as possible to ensure your order gets claimed.";
+                            String tempDialogTitle = "Error Submitting Order";
+                            String tempPositiveButtonText = "Ok";
+                            boolean tempCancelable = false;
+
+                            DialogBuilder dialogBuilder = new DialogBuilder();
+                            dialogBuilder.CreateNewStaticDialog(this, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+
                         }
 
                         Email m = new Email("order.lawnhiro@gmail.com", "0rd3rL@WN");
@@ -160,11 +175,15 @@ public class HomeScreen extends AppCompatActivity {
                             if (m.send()) {
                                 //Toast.makeText(HomeScreen.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(HomeScreen.this, "Email was not sent.", Toast.LENGTH_LONG).show();
+                                tempToastMessage = "Email was not sent. Please inform Lawnhiro of this error.";
+                                dialogBuilder.Toaster(context, tempToastMessage);
+                                //Toast.makeText(HomeScreen.this, "Email was not sent. Please inform Lawnhiro of this error.", Toast.LENGTH_LONG).show();
                             }
                         } catch (Exception e) {
-                            Log.e("email", "email didn't send: ", e);
-                            Toast.makeText(HomeScreen.this, "There was a problem sending the email. Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
+                            tempToastMessage = "There was a problem sending the email. Please contact Lawnhiro.";
+                            dialogBuilder.Toaster(context, tempToastMessage);
+                            //Log.e("email", "email didn't send: ", e);
+                            //Toast.makeText(HomeScreen.this, "There was a problem sending the email. Please contact Lawnhiro.", Toast.LENGTH_LONG).show();
                         }
 
                         NotificationCompat.Builder nBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
@@ -182,19 +201,24 @@ public class HomeScreen extends AppCompatActivity {
                         String tempPositiveButtonText = "Ok";
                         boolean tempCancelable = false;
 
-                        DialogBuilder dialogBuilder = new DialogBuilder();
+                        //DialogBuilder dialogBuilder = new DialogBuilder();
                         dialogBuilder.CreateNewStaticDialog(this, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
                     }
                 } catch (JSONException e) {
-                    Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
+                    //Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
                 }
             }
         } else if (requestCode == 0 && resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
-            Log.i("paymentExample", "The user canceled.");
+            tempToastMessage = "Payment cancelled.";
+            dialogBuilder.Toaster(context, tempToastMessage);
+            //Toast.makeText(HomeScreen.this, "Payment cancelled.", Toast.LENGTH_LONG).show();
+            //Log.i("paymentExample", "The user canceled.");
         } else if (requestCode == 0 && resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-            Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
-            Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
+            tempToastMessage = "Payment was invalid. Please try again.";
+            dialogBuilder.Toaster(context, tempToastMessage);
+
+            // Toast.makeText(HomeScreen.this, "Payment was invalid. Please try again.", Toast.LENGTH_LONG).show();
+            //Log.i("paymentExample", "An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
         }
 
     }
@@ -240,13 +264,16 @@ public class HomeScreen extends AppCompatActivity {
                                             + tempCity + ", " + tempState + " " + tempZip);
                                 } else if (TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
                                             || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
-                                    String tempDialogMessage = "Please provide information for required fields.";
-                                    String tempDialogTitle = "Missing Required Fields";
-                                    String tempPositiveButtonText = "Ok";
-                                    boolean tempCancelable = false;
+                                    //String tempDialogMessage = "Please provide information for required fields.";
+                                    //String tempDialogTitle = "Missing Required Fields";
+                                    //String tempPositiveButtonText = "Ok";
+                                    //boolean tempCancelable = false;
 
-                                    DialogBuilder dialogBuilder = new DialogBuilder();
-                                    dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+                                    String tempToastMessage = "Please provide information for required fields.";
+                                    dialogBuilder.Toaster(context, tempToastMessage);
+
+                                    //DialogBuilder dialogBuilder = new DialogBuilder();
+                                    //dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
 
                                 } else {
                                     finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
@@ -279,7 +306,9 @@ public class HomeScreen extends AppCompatActivity {
         NodeList nodeList = zillowCaller.GetZillowAPIData(context, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
 
         if (nodeList.getLength() == 0) {
-            Toast.makeText(HomeScreen.this, "Unable to resolve address information. Please try again!", Toast.LENGTH_LONG).show();
+            String tempToastMessage = "Unable to resolve address information. Please try again!";
+            dialogBuilder.Toaster(context, tempToastMessage);
+            //Toast.makeText(HomeScreen.this, "Unable to resolve address information. Please try again!", Toast.LENGTH_LONG).show();
         } else {
             for (int temp = 0; temp < nodeList.getLength(); temp++) {
                 Node nNode = nodeList.item(temp);
@@ -377,7 +406,7 @@ public class HomeScreen extends AppCompatActivity {
             LayoutInflater li = LayoutInflater.from(context);
             View promptsView = li.inflate(R.layout.set_default_address_prompt, null);
 
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     context);
 
             // set prompts.xml to alertdialog builder
@@ -401,42 +430,49 @@ public class HomeScreen extends AppCompatActivity {
             // set dialog message
             alertDialogBuilder
                     .setCancelable(false)
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // get user input and set it to result
-                                    // edit text
-                                    tempName = name.getText().toString();
-                                    tempEmail = email.getText().toString();
-                                    tempAddress1 = address1.getText().toString();
-                                    tempAddress2 = address2.getText().toString();
-                                    tempCity = city.getText().toString();
-                                    tempState = state.getText().toString();
-                                    tempZip = zip.getText().toString();
-
-                                    if (TextUtils.isEmpty(tempName) || TextUtils.isEmpty(tempEmail) || TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
-                                            || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
-                                        String tempDialogMessage = "Please provide information for required fields.";
-                                        String tempDialogTitle = "Missing Required Fields";
-                                        String tempPositiveButtonText = "Ok";
-                                        boolean tempCancelable = false;
-
-                                        DialogBuilder dialogBuilder = new DialogBuilder();
-                                        dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
-                                    } else {
-                                        addressPreference.setAddressPreferences(tempSettings, tempName, tempEmail, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
-
-                                        Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
-                                        getUserSettings();
-                                    }
-                                }
-                            });
+                    .setPositiveButton("OK", null);
 
             // create alert dialog
-            AlertDialog alertDialog = alertDialogBuilder.create();
+            final AlertDialog alertDialog = alertDialogBuilder.create();
 
             // show it
             alertDialog.show();
+
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Boolean wantToCloseDialog = false;
+                    // get user input and set it to result
+                    // edit text
+                    tempName = name.getText().toString();
+                    tempEmail = email.getText().toString();
+                    tempAddress1 = address1.getText().toString();
+                    tempAddress2 = address2.getText().toString();
+                    tempCity = city.getText().toString();
+                    tempState = state.getText().toString();
+                    tempZip = zip.getText().toString();
+
+                    if (TextUtils.isEmpty(tempName) || TextUtils.isEmpty(tempEmail) || TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
+                            || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
+                        //String tempDialogMessage = "Please provide information for required fields.";
+                        //String tempDialogTitle = "Missing Required Fields";
+                        //String tempPositiveButtonText = "Ok";
+                        //boolean tempCancelable = false;
+
+                        String tempToastMessage = "Please provide information for required fields.";
+
+                        dialogBuilder.Toaster(context, tempToastMessage);
+                        //dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+                    } else {
+                        addressPreference.setAddressPreferences(tempSettings, tempName, tempEmail, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+                        String tempToastMessage = "Default address saved!";
+                        dialogBuilder.Toaster(context, tempToastMessage);
+
+                        //Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
+                        getUserSettings();
+                        alertDialog.dismiss();
+                    }}
+            });
         }
 
         else if (TextUtils.isEmpty(tempAddress2)) {
