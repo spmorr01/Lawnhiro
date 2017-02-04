@@ -414,10 +414,21 @@ public class HomeScreen extends AppCompatActivity {
                                     tempState = state.getText().toString();
                                     tempZip = zip.getText().toString();
 
-                                    addressPreference.setAddressPreferences(tempSettings, tempName, tempEmail, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+                                    if (TextUtils.isEmpty(tempName) || TextUtils.isEmpty(tempEmail) || TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
+                                            || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
+                                        String tempDialogMessage = "Please provide information for required fields.";
+                                        String tempDialogTitle = "Missing Required Fields";
+                                        String tempPositiveButtonText = "Ok";
+                                        boolean tempCancelable = false;
 
-                                    Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
-                                    getUserSettings();
+                                        DialogBuilder dialogBuilder = new DialogBuilder();
+                                        dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+                                    } else {
+                                        addressPreference.setAddressPreferences(tempSettings, tempName, tempEmail, tempAddress1, tempAddress2, tempCity, tempState, tempZip);
+
+                                        Toast.makeText(HomeScreen.this, "Default address saved!", Toast.LENGTH_LONG).show();
+                                        getUserSettings();
+                                    }
                                 }
                             });
 
