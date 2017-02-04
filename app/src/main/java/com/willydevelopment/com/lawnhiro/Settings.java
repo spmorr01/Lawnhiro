@@ -76,7 +76,19 @@ public class Settings extends AppCompatActivity {
         tempCity = City.getText().toString();
         tempState = State.getText().toString();
         tempZip = Zip.getText().toString();
-        setDefaultAddressInformation();
+
+        if (TextUtils.isEmpty(tempName) || TextUtils.isEmpty(tempEmail) || TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
+                || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
+            String tempDialogMessage = "Please provide information for required fields.";
+            String tempDialogTitle = "Missing Required Fields";
+            String tempPositiveButtonText = "Ok";
+            boolean tempCancelable = false;
+
+            DialogBuilder dialogBuilder = new DialogBuilder();
+            dialogBuilder.CreateNewStaticDialog(this, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+        } else {
+            setDefaultAddressInformation();
+        }
 
         Intent intent=new Intent();
         setResult(100);

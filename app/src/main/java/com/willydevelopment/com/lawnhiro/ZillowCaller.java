@@ -33,17 +33,13 @@ public class ZillowCaller {
 
             URL url = new URL("http://www.zillow.com/webservice/GetDeepSearchResults.htm?zws-id=" + context.getString(R.string.zillow_api_key) + "&address=" + URLEncoder.encode(addressParams, "UTF-8") + "&citystatezip=" + URLEncoder.encode(cityStateZipParams, "UTF-8"));
 
-            URLConnection conn = url.openConnection(); //add citystatezip parameter!!!!
+            URLConnection conn = url.openConnection();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(conn.getInputStream());
 
             doc.getDocumentElement().normalize();
-            //System.out.println("Root element :"
-            //+ doc.getDocumentElement().getNodeName());
-
-
             nList = doc.getElementsByTagName("result");
         }  catch (Exception e) {
         e.printStackTrace();

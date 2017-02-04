@@ -176,21 +176,14 @@ public class HomeScreen extends AppCompatActivity {
                         nNotificationManager.notify(1, nBuilder.build());
                         //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
                     } else {
-                        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-                        dlgAlert.setMessage("Something went wrong when trying to confirm your PayPal payment. Please try again or contact " +
-                                "Lawnhiro for support.");
-                        dlgAlert.setTitle("Error Confirming Payment");
-                        dlgAlert.setPositiveButton("OK", null);
-                        dlgAlert.setCancelable(false);
-                        dlgAlert.create().show();
+                        String tempDialogMessage = "Something went wrong when trying to confirm your PayPal payment. Please try again or contact " +
+                                "Lawnhiro for support.";
+                        String tempDialogTitle = "Error Confirming Payment";
+                        String tempPositiveButtonText = "Ok";
+                        boolean tempCancelable = false;
 
-                        dlgAlert.setPositiveButton("Ok",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-
+                        DialogBuilder dialogBuilder = new DialogBuilder();
+                        dialogBuilder.CreateNewStaticDialog(this, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
                     }
                 } catch (JSONException e) {
                     Log.e("paymentExample", "an extremely unlikely failure occurred: ", e);
@@ -212,8 +205,7 @@ public class HomeScreen extends AppCompatActivity {
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.address_prompt, null);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
@@ -246,6 +238,16 @@ public class HomeScreen extends AppCompatActivity {
                                 if (TextUtils.isEmpty(tempAddress2)) {
                                     finalAddress.setText(tempAddress1 + ", "
                                             + tempCity + ", " + tempState + " " + tempZip);
+                                } else if (TextUtils.isEmpty(tempAddress1) || TextUtils.isEmpty(tempCity)
+                                            || TextUtils.isEmpty(tempState) || TextUtils.isEmpty(tempZip)) {
+                                    String tempDialogMessage = "Please provide information for required fields.";
+                                    String tempDialogTitle = "Missing Required Fields";
+                                    String tempPositiveButtonText = "Ok";
+                                    boolean tempCancelable = false;
+
+                                    DialogBuilder dialogBuilder = new DialogBuilder();
+                                    dialogBuilder.CreateNewStaticDialog(context, tempDialogMessage, tempDialogTitle, tempPositiveButtonText, tempCancelable);
+
                                 } else {
                                     finalAddress.setText(tempAddress1 + ", " + tempAddress2 + ", "
                                             + tempCity + ", " + tempState + " " + tempZip);
@@ -271,24 +273,6 @@ public class HomeScreen extends AppCompatActivity {
 
 
     public void getPriceButtonClick(View view) {
-        LayoutInflater li = LayoutInflater.from(context);
-        View promptsView = li.inflate(R.layout.price_prompt, null);
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(promptsView);
-
-        final EditText orderNotes = (EditText) promptsView
-                .findViewById(R.id.textNotes);
-
-        final TextView price = (TextView) promptsView
-                .findViewById(R.id.textPrice);
-
-        final Spinner businessSource = (Spinner) promptsView
-                .findViewById(R.id.businessSource);
-
         PriceCalculator priceCalculator = new PriceCalculator();
         ZillowCaller zillowCaller = new ZillowCaller();
 
@@ -310,9 +294,27 @@ public class HomeScreen extends AppCompatActivity {
                 }
             }
 
-
             mowableSize = lotSize - finishedSize;
             finalPrice = priceCalculator.CalculatePrice(mowableSize);
+
+            LayoutInflater li = LayoutInflater.from(context);
+            View promptsView = li.inflate(R.layout.price_prompt, null);
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+
+            // set prompts.xml to alertdialog builder
+            alertDialogBuilder.setView(promptsView);
+
+            final EditText orderNotes = (EditText) promptsView
+                    .findViewById(R.id.textNotes);
+
+            final TextView price = (TextView) promptsView
+                    .findViewById(R.id.textPrice);
+
+            final Spinner businessSource = (Spinner) promptsView
+                    .findViewById(R.id.businessSource);
+
             price.setText("$" + finalPrice);
 
             alertDialogBuilder.setCancelable(true);

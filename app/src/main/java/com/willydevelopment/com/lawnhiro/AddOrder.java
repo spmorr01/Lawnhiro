@@ -18,13 +18,6 @@ public class AddOrder {
     public boolean addOrderToLawnhiro(String webApiHttp, String tempBusinessSource, String tempPayPalOrderID, String tempName, String tempEmail, String tempAddress1, String tempAddress2,
                                         String tempCity, String tempState, String tempZip, int mowableSize, int finalPrice, String tempServiceType, String orderNotes) {
 
-
-
-        StringBuilder sb = new StringBuilder();
-
-        //String webApiHttp = String.valueOf(R.string.mobile_api_url);
-
-
         HttpURLConnection urlConnection=null;
         try {
             addSuccess = false;
@@ -82,8 +75,6 @@ public class AddOrder {
             if(urlConnection!=null)
                 urlConnection.disconnect();
         }
-
-
         return addSuccess;
     }
 }
